@@ -15,7 +15,6 @@ def flag_three_correct_cards():
         card_data = mw.col.db.first("SELECT id, flags FROM cards WHERE id = ?", card_id)
         
         if card_data and card_data[1] == 4:
-            print("Skipping lower-order cards")
             continue
         
         reviews = mw.col.db.all(
@@ -31,7 +30,12 @@ def flag_three_correct_cards():
     
     # Use the new API - flag all cards at once
     if cards_to_flag:
+        # 1. Apply Green Flag
         mw.col.set_user_flag_for_cards(3, cards_to_flag)  # 1 = Red flag
+        
+        # 2. Suspend the cards
+        mw.col.sched.suspend_cards(cards_to_flag)
+        
     
     # Refresh the browser if it's open
     if hasattr(mw, 'browser') and mw.browser:
