@@ -14,7 +14,11 @@ def flag_three_correct_cards():
     for card_id in card_ids:
         card_data = mw.col.db.first("SELECT id, flags FROM cards WHERE id = ?", card_id)
         
-        if card_data and card_data[1] == 4:
+        # Check if the card is already flagged with Blue (4) or Pink (5)
+        # Blue means the card is a lower-order detail that should stay in the review cycle
+        # Pink means the card is currently not being used (i.e. because no mindmap has been created for that topic yet)
+        # card_data[1] is the 'flags' column from the database query
+        if card_data and (card_data[1] == 4 or card_data[1] == 5):
             continue
         
         reviews = mw.col.db.all(
